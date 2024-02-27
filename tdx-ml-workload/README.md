@@ -8,13 +8,13 @@ make
 
 **Create Key Transfer Policy on KBS**
 
-**Create Data Encryption Key on KBS**
+**Create AES 256 Key on KBS**
 
 **Associate Key Transfer Policy with Key**
 
 **Encrypt the datafile using encryptor**
 
-**Push the encrypted datafile under /etc/**
+**Push the encrypted datafile under /etc/ on TDVM**
 
 **Install TDX CLI**
 

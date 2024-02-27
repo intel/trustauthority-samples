@@ -18,12 +18,14 @@ const (
 	envServicePort              = "SERVICE_PORT"
 	envEnableLogCaller          = "LOG_CALLER"
 	envLogLevel                 = "LOG_LEVEL"
+	envSanList                  = "SAN_LIST"
 	envSkipTlsVerification      = "SKIP_TLS_VERIFICATION"
 	envHttpClientTimeoutSeconds = "HTTP_CLIENT_TIMEOUT_IN_SECONDS"
 
 	envTrustAuthorityAPIUrl = "TRUSTAUTHORITY_API_URL"
 	envTrustAuthorityAPIKey = "TRUSTAUTHORITY_API_KEY"
 
+	defaultSanList     = "127.0.0.1,localhost"
 	defaultPort        = "12780"
 	defaultLogLevel    = "info"
 	defaultHttpTimeout = "10"
@@ -31,6 +33,7 @@ const (
 
 type Configuration struct {
 	Port                int
+	SanList             string
 	LogCaller           bool
 	LogLevel            log.Level
 	SkipTLSVerification bool
@@ -56,12 +59,14 @@ func NewConfigFromEnv() (*Configuration, error) {
 	// Setup defaults by associating the structure's field names to the defaults.
 	viper.SetDefault("Port", defaultPort)
 	viper.SetDefault("LogCaller", "false")
+	viper.SetDefault("SanList", defaultSanList)
 	viper.SetDefault("SkipTlsVerification", "true")
 	viper.SetDefault("HTTPClientTimeout", defaultHttpTimeout)
 
 	// map structure field names to env var names (log level is handled manually below)
 	envBinding := map[string]string{
 		"Port":                envServicePort,
+		"SanList":             envSanList,
 		"LogCaller":           envEnableLogCaller,
 		"SkipTLSVerification": envSkipTlsVerification,
 		"HTTPClientTimeout":   envHttpClientTimeoutSeconds,
@@ -94,6 +99,7 @@ func NewConfigFromEnv() (*Configuration, error) {
 
 	log.WithFields(log.Fields{
 		"Port":                conf.Port,
+		"SanList":             conf.SanList,
 		"LogLevel":            conf.LogLevel,
 		"LogCaller":           conf.LogCaller,
 		"SkipTLSVerification": conf.SkipTLSVerification,

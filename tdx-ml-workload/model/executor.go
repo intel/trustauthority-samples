@@ -14,8 +14,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
-	"crypto/x509"
-	"encoding/pem"
 	"os"
 	"unsafe"
 
@@ -23,17 +21,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	privateKeyLocation = "envelope.key"
-)
-
 type ModelExecutor struct {
 	modelPath string
+	privKey   *rsa.PrivateKey
 }
 
-func NewModelExecutor(mpath string) *ModelExecutor {
+func NewModelExecutor(mpath string, pkey *rsa.PrivateKey) *ModelExecutor {
 	return &ModelExecutor{
 		modelPath: mpath,
+		privKey:   pkey,
 	}
 }
 
@@ -91,7 +87,7 @@ func (m *ModelExecutor) DecryptModel(swk, dek []byte) error {
 		return errors.New("Size of ai model can't be zero!")
 	}
 
-	key, err := UnwrapKey(swk, privateKeyLocation)
+	key, err := UnwrapKey(swk, m.privKey)
 	if err != nil {
 		return errors.Wrap(err, "Error while unwrapping the swk")
 	}
@@ -110,19 +106,7 @@ func (m *ModelExecutor) DecryptModel(swk, dek []byte) error {
 	return nil
 }
 
-func UnwrapKey(wrappedKey []byte, privateKeyLocation string) ([]byte, error) {
-
-	privateKey, err := os.ReadFile(privateKeyLocation)
-	if err != nil {
-		return nil, errors.Wrap(err, "Error reading private envelope key file")
-	}
-
-	privateKeyBlock, _ := pem.Decode(privateKey)
-	var pri *rsa.PrivateKey
-	pri, err = x509.ParsePKCS1PrivateKey(privateKeyBlock.Bytes)
-	if err != nil {
-		return nil, errors.Wrap(err, "Error decoding private envelope key")
-	}
+func UnwrapKey(wrappedKey []byte, pri *rsa.PrivateKey) ([]byte, error) {
 
 	decryptedKey, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, pri, wrappedKey, nil)
 	if err != nil {
