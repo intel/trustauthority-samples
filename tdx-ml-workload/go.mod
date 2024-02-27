@@ -1,6 +1,6 @@
 module github.com/intel/trustauthority-samples/tdxexample
 
-go 1.21.0
+go 1.21.6
 
 require (
 	github.com/go-kit/kit v0.12.0

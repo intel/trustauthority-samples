@@ -1,0 +1,7 @@
+go 1.21.6
+
+use (
+	.
+	./kbs-client
+	./tdx-ml-workload
+)

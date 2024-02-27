@@ -1,6 +1,6 @@
 module github.com/intel/kbs/v1/client
 
-go 1.21.0
+go 1.21.6
 
 require (
 	github.com/intel/trustauthority-client v1.1.0
