@@ -21,8 +21,8 @@ const (
 	envSkipTlsVerification      = "SKIP_TLS_VERIFICATION"
 	envHttpClientTimeoutSeconds = "HTTP_CLIENT_TIMEOUT_IN_SECONDS"
 
-	envITAUrl    = "ITA_API_URL"
-	envITAApiKey = "ITA_API_KEY"
+	envTrustAuthorityAPIUrl = "TRUSTAUTHORITY_API_URL"
+	envTrustAuthorityAPIKey = "TRUSTAUTHORITY_API_KEY"
 
 	defaultPort        = "12780"
 	defaultLogLevel    = "info"
@@ -36,8 +36,8 @@ type Configuration struct {
 	SkipTLSVerification bool
 	HTTPClientTimeout   int
 
-	ITAURL    string
-	ITAAPIKey string
+	TrustAuthorityUrl string
+	TrustAuthorityKey string
 }
 
 func configure() (*Configuration, error) {
@@ -65,8 +65,8 @@ func NewConfigFromEnv() (*Configuration, error) {
 		"LogCaller":           envEnableLogCaller,
 		"SkipTLSVerification": envSkipTlsVerification,
 		"HTTPClientTimeout":   envHttpClientTimeoutSeconds,
-		"ITAUrl":              envITAUrl,
-		"ITAApiKey":           envITAApiKey,
+		"TrustAuthorityUrl":   envTrustAuthorityAPIUrl,
+		"TrustAuthorityKey":   envTrustAuthorityAPIKey,
 	}
 
 	for fieldName, envVar := range envBinding {
@@ -98,7 +98,7 @@ func NewConfigFromEnv() (*Configuration, error) {
 		"LogCaller":           conf.LogCaller,
 		"SkipTLSVerification": conf.SkipTLSVerification,
 		"HTTPClientTimeout":   conf.HTTPClientTimeout,
-		"ITAUrl":              conf.ITAURL,
+		"TrustAuthorityUrl":   conf.TrustAuthorityUrl,
 	}).Info("Parse configs from environment")
 
 	return &conf, nil
@@ -110,18 +110,18 @@ func (conf *Configuration) Validate() error {
 		return errors.New("Configured port is not valid")
 	}
 
-	if conf.ITAURL == "" || conf.ITAAPIKey == "" {
-		return errors.New("Either ITA API URL or APIKey is missing")
+	if conf.TrustAuthorityUrl == "" || conf.TrustAuthorityKey == "" {
+		return errors.New("Either Trust Authority API URL or APIKey is missing")
 	}
 
-	_, err := url.Parse(conf.ITAURL)
+	_, err := url.Parse(conf.TrustAuthorityUrl)
 	if err != nil {
-		return errors.Wrap(err, "ITA API URL is not a valid url")
+		return errors.Wrap(err, "Trust Authority API URL is not a valid url")
 	}
 
-	_, err = base64.StdEncoding.DecodeString(conf.ITAAPIKey)
+	_, err = base64.StdEncoding.DecodeString(conf.TrustAuthorityKey)
 	if err != nil {
-		return errors.Wrap(err, "ITA ApiKey is not a valid base64 string")
+		return errors.Wrap(err, "Trust Authority ApiKey is not a valid base64 string")
 	}
 
 	return nil

@@ -67,7 +67,7 @@ func (svc service) GetKey(_ context.Context, req GetKeyRequest) (*GetKeyResponse
 		var nonce *connector.VerifierNonce
 		err = json.Unmarshal(resp, &nonce)
 		if err != nil {
-			return nil, errors.New("could not unmarshal ITA nonce")
+			return nil, errors.New("could not unmarshal verifier nonce")
 		}
 
 		quote, userData, err := collectEvidence(base64.StdEncoding.EncodeToString(append(nonce.Val, nonce.Iat[:]...)), svc.userData)

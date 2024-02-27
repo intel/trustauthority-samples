@@ -13,21 +13,21 @@ TMPDIR := $(addprefix $(makefile_dir),tmp)
 
 all: clean installer
 
-ita-demo:
-	CGO_CFLAGS_ALLOW="-f.*" go build -ldflags "-X github.com/intel/trustauthority-samples/tdxexample/version.BuildDate=$(BUILDDATE) -X github.com/intel/trustauthority-samples/tdxexample/version.Version=$(VERSION) -X github.com/intel/trustauthority-samples/tdxexample/version.GitHash=$(GITCOMMIT)" -o ita-demo
+trustauthority-demo:
+	CGO_CFLAGS_ALLOW="-f.*" go build -ldflags "-X github.com/intel/trustauthority-samples/tdxexample/version.BuildDate=$(BUILDDATE) -X github.com/intel/trustauthority-samples/tdxexample/version.Version=$(VERSION) -X github.com/intel/trustauthority-samples/tdxexample/version.GitHash=$(GITCOMMIT)" -o trustauthority-demo
 
-installer: ita-demo
+installer: trustauthority-demo
 	mkdir -p installer
 	cp build/linux/* installer/
 	chmod +x installer/install.sh
-	cp ita-demo installer/ita-demo
-	makeself installer ita-demo-$(VERSION).bin "ita-demo $(VERSION)" ./install.sh
+	cp trustauthority-demo installer/trustauthority-demo
+	makeself installer trustauthority-demo-$(VERSION).bin "trustauthority-demo $(VERSION)" ./install.sh
 	rm -rf installer
 
 clean:
 	if pushd $(makefile_dir); then \
 		rm -rf $(OUTDIR) $(TMPDIR); \
-		rm -f *.bin ita-demo; \
+		rm -f *.bin trustauthority-demo; \
 	fi;
 
 help:

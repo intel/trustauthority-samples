@@ -1,4 +1,4 @@
-# ITA Demo
+# TrustAuthority Demo
 
 ## Build
 
@@ -18,15 +18,15 @@ make
 
 **Install TDX CLI**
 
-**Install ITA Demo App**
+**Install TrustAuthority Demo App**
 
-Create ita-demo.env file under /tmp/ with below contents :
+Create trustauthority-demo.env file under /tmp/ with below contents :
 
-ITA_API_URL=<ita api url> <br>
-ITA_API_KEY=<ita api key> <br>
+TRUSTAUTHORITY_API_URL=<trustauthority api url> <br>
+TRUSTAUTHORITY_API_KEY=<trustauthority api key> <br>
 HTTPS_PROXY=<proxy if any> <br>
 
-**./ita-demo-v1.0.0.bin**
+**./trustauthority-demo-v1.0.0.bin**
 
 ## API Spec
 

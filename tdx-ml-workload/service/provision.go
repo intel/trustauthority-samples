@@ -36,6 +36,5 @@ func (svc service) Provision(_ context.Context, req ProvisionRequest) (interface
 		return nil, errors.Wrap(err, "Invalid Api key, must be base64 string")
 	}
 
-	//svc.itaClient = svc.itaClient.SetApiKey(req.ApiKey)
 	return &ModelResponse{http.StatusNoContent}, nil
 }

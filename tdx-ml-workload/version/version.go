@@ -20,7 +20,7 @@ type ServiceVersion struct {
 }
 
 var serviceVersion = ServiceVersion{
-	Name:      "ITA Demo App",
+	Name:      "TrustAuthority Demo App",
 	Version:   Version,
 	GitHash:   GitHash,
 	BuildDate: BuildDate,

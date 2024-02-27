@@ -6,11 +6,11 @@ WantedBy=multi-user.target
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/ita-demo
-ExecStart=/usr/local/bin/ita-demo
+WorkingDirectory=/opt/trustauthority-demo
+ExecStart=/usr/local/bin/trustauthority-demo
 ExecReload=/bin/kill -s HUP $MAINPID
 Restart=on-failure
 TimeoutStartSec=0
 PermissionsStartOnly=true
-RuntimeDirectory=ita-demo
+RuntimeDirectory=trustauthority-demo
 RuntimeDirectoryMode=0775
