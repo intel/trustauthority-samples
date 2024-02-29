@@ -119,7 +119,7 @@ uint32_t decrypt_aes_wrapped_secret(uint8_t* wrappedSecret,
     std::cout << "Cipher Text Length : " << cipher_text_len;
 
     // Copy of DEK
-    aes_gcm_256bit_key_t *sk_key = (aes_gcm_256bit_key_t *)malloc (sizeof(aes_gcm_256bit_key_t));
+    aes_gcm_256bit_key_t *sk_key = (aes_gcm_256bit_key_t *)malloc (sizeof(uint8_t) * AESGCM_256_KEY_SIZE);
     if (!sk_key) {
         printf("DEK buffer memory allocation failed.");
         return -1;
@@ -132,7 +132,6 @@ uint32_t decrypt_aes_wrapped_secret(uint8_t* wrappedSecret,
     memcpy (mac, wrappedSecret + SGX_AESGCM_IV_SIZE+ plaintext_len, SGX_AESGCM_MAC_SIZE);
 
     // IV initialisation
-    uint8_t iv_length = SGX_AESGCM_IV_SIZE;
     unsigned char iv[SGX_AESGCM_IV_SIZE];
     memcpy(iv, wrappedSecret, SGX_AESGCM_IV_SIZE);
 
@@ -141,17 +140,18 @@ uint32_t decrypt_aes_wrapped_secret(uint8_t* wrappedSecret,
 				  cipher_text_len, //Cipher len
 				  *plaintext, // Plaintext
 				  iv, // Initialisation vector
-				  iv_length, // IV Length
+				  SGX_AESGCM_IV_SIZE, // IV Length
 				  NULL, // AAD Buffer
 				  0, // AAD Length
 				  &mac); // MAC
 
-
+      free(sk_key);
+      sk_key = NULL;
     if (0 != ret_code) {
         printf("Secret decryption failed!");
         return ret_code;
     }
-
+/*
     uint8_t *plaintext_printable = (uint8_t *)malloc (plaintext_len);
     if (!plaintext_printable) {
 	 printf("Plaintext Printable buffer memory allocation failed.");
@@ -161,7 +161,7 @@ uint32_t decrypt_aes_wrapped_secret(uint8_t* wrappedSecret,
     memcpy(plaintext_printable, *plaintext, plaintext_len);
 
     plaintext_printable[plaintext_len] = '\0';
-
+*/
     printf("Secret unwrapped successfully...");
 
     return 0;
@@ -183,6 +183,10 @@ int model_decrypt(uint8_t* wrapped_model,
 
     if (ret_code != 0) {
         printf("Decryption of DEK failed. Check error code.");
+        if (data != NULL) {
+          free(data);
+          data = NULL;
+        }
         return ret_code;
     }
 
@@ -195,8 +199,14 @@ int model_decrypt(uint8_t* wrapped_model,
                               swk,
                               &data);
 
+      free(swk);
+      swk = NULL;
     if (ret_code != 0) {
         printf("Decryption of model failed. Check error code.");
+        if (data != NULL) {
+          free(data);
+          data = NULL;
+        }
         return ret_code;
     }
 

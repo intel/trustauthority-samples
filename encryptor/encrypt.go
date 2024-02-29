@@ -17,6 +17,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"syscall"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -25,6 +27,7 @@ import (
 func Encrypt(modelPath string, privateKeyLocation string, encryptedFileLocation string, wrappedKey []byte) error {
 
 	// reading model file
+	modelPath = filepath.Clean(modelPath)
 	model, err := os.ReadFile(modelPath)
 	if err != nil {
 		return errors.Wrap(err, "Error reading the data file")
@@ -52,7 +55,17 @@ func Encrypt(modelPath string, privateKeyLocation string, encryptedFileLocation 
 	}
 
 	encryptedData := gcm.Seal(iv, iv, model, nil)
-	err = os.WriteFile(encryptedFileLocation, encryptedData, 0600)
+	file, err := os.OpenFile(encryptedFileLocation, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|syscall.O_NOFOLLOW, 0600)
+	if err != nil {
+		return errors.Wrapf(err, "Error opening %s file", encryptedFileLocation)
+	}
+	defer func() {
+		derr := file.Close()
+		if derr != nil {
+			logrus.WithError(derr).Errorf("Error closing %s file", encryptedFileLocation)
+		}
+	}()
+	_, err = file.Write(encryptedData)
 	if err != nil {
 		return errors.Wrap(err, "Error during writing the encrypted data to file")
 	}
@@ -63,16 +76,20 @@ func Encrypt(modelPath string, privateKeyLocation string, encryptedFileLocation 
 
 func UnwrapKey(wrappedKey []byte, privateKeyLocation string) ([]byte, error) {
 
+	privateKeyLocation = filepath.Clean(privateKeyLocation)
 	privateKey, err := os.ReadFile(privateKeyLocation)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error reading private envelope key file")
+		return nil, errors.Wrap(err, "Error reading private key file")
 	}
 
 	privateKeyBlock, _ := pem.Decode(privateKey)
-	var pri *rsa.PrivateKey
-	pri, err = x509.ParsePKCS1PrivateKey(privateKeyBlock.Bytes)
+	if privateKeyBlock == nil {
+		return nil, errors.New("private key not found")
+	}
+
+	pri, err := x509.ParsePKCS1PrivateKey(privateKeyBlock.Bytes)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error decoding private envelope key")
+		return nil, errors.Wrap(err, "Error decoding private key")
 	}
 
 	decryptedKey, err := rsa.DecryptOAEP(sha512.New384(), rand.Reader, pri, wrappedKey, nil)
@@ -92,9 +109,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	wrappedKey, err := os.ReadFile(os.Args[3])
+	wrappedKeyLocation := filepath.Clean(os.Args[3])
+	wrappedKey, err := os.ReadFile(wrappedKeyLocation)
 	if err != nil {
-		fmt.Println("Error reading wrapped key file", err)
+		fmt.Println("Error reading wrapped key file: ", err)
 		os.Exit(1)
 	}
 
@@ -104,7 +122,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// encrypt the image with key retrieved from KBS
+	// encrypt the model with key retrieved from KBS
 	err = Encrypt(os.Args[1], os.Args[2], "model.enc", key)
 	if err != nil {
 		fmt.Println("Data encryption failed: ", err)

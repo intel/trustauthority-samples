@@ -20,6 +20,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/intel/trustauthority-samples/tdxexample/model"
@@ -147,6 +148,7 @@ func generateTLSKeyandCert(TLSCertPath, TLSKeyPath, TlsSanList string) error {
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
+
 	// add the san list for tls certificate
 	hosts := strings.Split(TlsSanList, ",")
 	for _, h := range hosts {
@@ -165,9 +167,9 @@ func generateTLSKeyandCert(TLSCertPath, TLSKeyPath, TlsSanList string) error {
 		return errors.Wrap(err, "Failed to create certificate")
 	}
 	tlsCertPath := filepath.Clean(TLSCertPath)
-	certOut, err := os.OpenFile(tlsCertPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	certOut, err := os.OpenFile(tlsCertPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|syscall.O_NOFOLLOW, 0600)
 	if err != nil {
-		return fmt.Errorf("could not open file for writing: %v", err)
+		return fmt.Errorf("could not open %s file for writing: %v", tlsCertPath, err)
 	}
 	defer func() {
 		derr := certOut.Close()
@@ -185,9 +187,9 @@ func generateTLSKeyandCert(TLSCertPath, TLSKeyPath, TlsSanList string) error {
 		return errors.Wrap(err, "Unable to marshal private key")
 	}
 	tlsKeyPath := filepath.Clean(TLSKeyPath)
-	keyOut, err := os.OpenFile(tlsKeyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600) // open file with restricted permissions
+	keyOut, err := os.OpenFile(tlsKeyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|syscall.O_NOFOLLOW, 0600) // open file with restricted permissions
 	if err != nil {
-		return fmt.Errorf("could not open private key file for writing: %v", err)
+		return fmt.Errorf("could not open %s file for writing: %v", tlsKeyPath, err)
 	}
 	defer func() {
 		derr := keyOut.Close()

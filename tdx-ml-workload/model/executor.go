@@ -15,6 +15,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"os"
+	"path/filepath"
 	"unsafe"
 
 	"github.com/pkg/errors"
@@ -48,7 +49,6 @@ func (m *ModelExecutor) ResetModel() error {
 func (m *ModelExecutor) ExecuteModel(pregnancies float32,
 	glucose float32, bloodpressure float32, skinthickness float32, insulin float32, bmi float32,
 	dbf float32, age float32) (int, error) {
-
 	log.Debug("Executing Model. ")
 
 	var inferedValue C.int
@@ -73,7 +73,8 @@ func (m *ModelExecutor) ExecuteModel(pregnancies float32,
 func (m *ModelExecutor) DecryptModel(swk, dek []byte) error {
 	log.Debug("Decrypting Model. ")
 	// read ai model from a file
-	model, err := os.ReadFile(m.modelPath)
+	modelPath := filepath.Clean(m.modelPath)
+	model, err := os.ReadFile(modelPath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return errors.New("AI model file does not exist. Please check filepath again.")

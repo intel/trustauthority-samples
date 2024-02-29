@@ -14,7 +14,9 @@ TMPDIR := $(addprefix $(makefile_dir),tmp)
 all: clean installer
 
 trustauthority-demo:
-	CGO_CFLAGS_ALLOW="-f.*" go build -ldflags "-X github.com/intel/trustauthority-samples/tdxexample/version.BuildDate=$(BUILDDATE) -X github.com/intel/trustauthority-samples/tdxexample/version.Version=$(VERSION) -X github.com/intel/trustauthority-samples/tdxexample/version.GitHash=$(GITCOMMIT)" -o trustauthority-demo
+	CGO_CFLAGS_ALLOW="-f.*" CGO_CFLAGS="-O2 -D_FORTIFY_SOURCE=2" go build -buildmode=pie -trimpath -ldflags "-s -linkmode=external -extldflags -Wl,-O1,-z,relro,-z,now \
+		-X github.com/intel/trustauthority-samples/tdxexample/version.BuildDate=$(BUILDDATE) -X github.com/intel/trustauthority-samples/tdxexample/version.Version=$(VERSION) \
+		-X github.com/intel/trustauthority-samples/tdxexample/version.GitHash=$(GITCOMMIT)" -o trustauthority-demo
 
 installer: trustauthority-demo
 	mkdir -p installer
