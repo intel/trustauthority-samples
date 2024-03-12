@@ -18,7 +18,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"syscall"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -26,7 +25,6 @@ import (
 
 func Encrypt(modelPath string, privateKeyLocation string, encryptedFileLocation string, wrappedKey []byte) error {
 
-	// reading model file
 	modelPath = filepath.Clean(modelPath)
 	model, err := os.ReadFile(modelPath)
 	if err != nil {
@@ -55,17 +53,7 @@ func Encrypt(modelPath string, privateKeyLocation string, encryptedFileLocation 
 	}
 
 	encryptedData := gcm.Seal(iv, iv, model, nil)
-	file, err := os.OpenFile(encryptedFileLocation, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|syscall.O_NOFOLLOW, 0600)
-	if err != nil {
-		return errors.Wrapf(err, "Error opening %s file", encryptedFileLocation)
-	}
-	defer func() {
-		derr := file.Close()
-		if derr != nil {
-			logrus.WithError(derr).Errorf("Error closing %s file", encryptedFileLocation)
-		}
-	}()
-	_, err = file.Write(encryptedData)
+	err = os.WriteFile(encryptedFileLocation, encryptedData, 0600)
 	if err != nil {
 		return errors.Wrap(err, "Error during writing the encrypted data to file")
 	}

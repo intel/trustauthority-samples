@@ -43,8 +43,7 @@ func (kc *kbsClient) TransferKey() ([]byte, string, error) {
 
 	var queryParams map[string]string = nil
 	var headers = map[string]string{
-		HTTPHeaderTypeXApiKey: kc.ApiKey,
-		HTTPHeaderKeyAccept:   HTTPHeaderValueApplicationJson,
+		HTTPHeaderKeyAccept: HTTPHeaderValueApplicationJson,
 	}
 
 	var body []byte
@@ -81,10 +80,9 @@ func (kc *kbsClient) TransferKeyWithEvidence(request *KeyTransferRequest, attest
 
 	var queryParams map[string]string = nil
 	var headers = map[string]string{
-		//	HTTPHeaderTypeXApiKey:        kc.ApiKey,
-		HTTPHeaderKeyContentType: HTTPHeaderValueApplicationJson,
-		HTTPHeaderKeyAccept:      HTTPHeaderValueApplicationJson,
-		//	HTTPHeaderKeyAttestationType: attestationType,
+		HTTPHeaderKeyContentType:     HTTPHeaderValueApplicationJson,
+		HTTPHeaderKeyAccept:          HTTPHeaderValueApplicationJson,
+		HTTPHeaderKeyAttestationType: attestationType,
 	}
 
 	var body []byte

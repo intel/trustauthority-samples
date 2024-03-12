@@ -9,6 +9,7 @@ import (
 	"context"
 	"net/http"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -49,11 +50,11 @@ func (svc service) GetAttestationToken(_ context.Context) (*GetAttestationTokenR
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		return nil, errors.Errorf("could not fetch token: %v", string(stderr.Bytes()))
+		return nil, errors.Wrapf(err, "could not fetch token: %v", string(stderr.Bytes()))
 	}
 
 	resp := &GetAttestationTokenResponse{
-		AttestationToken: string(stdout.Bytes()),
+		AttestationToken: strings.TrimSpace(string(stdout.Bytes())),
 	}
 	return resp, nil
 }

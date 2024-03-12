@@ -51,9 +51,12 @@ func (svc service) GetKey(_ context.Context, req GetKeyRequest) (*GetKeyResponse
 	var attestationType string
 	var request *kbsclient.KeyTransferRequest
 
-	keyUrl, _ := url.Parse(req.KeyTransferUrl)
-	client := kbsclient.NewKBSClient(svc.httpClient, keyUrl, "")
+	keyUrl, err := url.Parse(req.KeyTransferUrl)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not parse key transfer url")
+	}
 
+	client := kbsclient.NewKBSClient(svc.httpClient, keyUrl, "")
 	if req.AttestationToken != "" {
 		request = &kbsclient.KeyTransferRequest{
 			AttestationToken: req.AttestationToken,

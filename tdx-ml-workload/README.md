@@ -6,23 +6,21 @@ make
 
 ## Usage
 
-**Create Key Transfer Policy on KBS**
+**Create TDX Key Transfer Policy on KBS**
 
-**Create AES 256 Key on KBS**
+**Create AES 256 Key on KBS and associate it with Key Transfer Policy**
 
-**Associate Key Transfer Policy with Key**
-
-**Encrypt the datafile using encryptor**
+**Encrypt the datafile using [encryptor](../encryptor)**
 
 **Push the encrypted datafile under /etc/ on TDVM**
 
-**Install TDX CLI**
+**Install [TDX CLI](https://github.com/intel/trustauthority-client-for-go/blob/main/tdx-cli/README.md#installation)**
 
 **Install TrustAuthority Demo App**
 
 Create trustauthority-demo.env file under /tmp/ with below contents :
 
-TRUSTAUTHORITY_API_URL=<trustauthority api url> <br>
+TRUSTAUTHORITY_API_URL=https://api.trustauthority.intel.com <br>
 TRUSTAUTHORITY_API_KEY=<trustauthority api key> <br>
 HTTPS_PROXY=<proxy if any> <br>
 
@@ -33,7 +31,7 @@ HTTPS_PROXY=<proxy if any> <br>
 ### Get attestation token
 
 * **URL**
-  `http://{{taa}}:8080/taa/v1/token`
+  `https://<IP>:12780/taa/v1/token`
 
 * **Method:**
   `GET`
@@ -53,7 +51,7 @@ HTTPS_PROXY=<proxy if any> <br>
 Client should send the AttestationToken from the previous step and the "Key Transfer URL"
 
 * **URL**
-  `http://{{taa}}:8080/taa/v1/key`
+  `https://<IP>:12780/taa/v1/key`
 
 * **Method:**
   `POST`
@@ -90,7 +88,7 @@ Request JSON :
 Client should send the WrappedKey and WrappedSwk from the previous step
 
 * **URL**
-  `http://{{taa}}:8080/taa/v1/decrypt`
+  `https://<IP>:12780/taa/v1/decrypt`
 
 * **Method:**
   `POST`
@@ -118,7 +116,7 @@ Request JSON :
 ### Execute model
 
 * **URL**
-  `http://{{taa}}:8080/taa/v1/execute`
+  `https://<IP>:12780/taa/v1/execute`
 
 * **Method:**
   `POST`

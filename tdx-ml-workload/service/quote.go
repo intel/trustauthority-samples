@@ -55,7 +55,10 @@ func collectEvidence(nonce, userData string) ([]byte, []byte, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	runtimeData, _ := base64.StdEncoding.DecodeString(userData)
+	runtimeData, err := base64.StdEncoding.DecodeString(userData)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	return out[:], runtimeData, nil
 }

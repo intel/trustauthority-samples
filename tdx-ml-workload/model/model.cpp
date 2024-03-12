@@ -41,7 +41,6 @@ uint32_t aes_256gcm_decrypt(const aes_gcm_256bit_key_t *p_key, const uint8_t *p_
 
      // Autenthication Tag returned by Decrypt to be compared with Tag created during seal
      memset(&l_tag, 0, SGX_AESGCM_MAC_SIZE);
-
      memcpy(l_tag, p_in_mac, SGX_AESGCM_MAC_SIZE);
 
      do {
@@ -151,19 +150,8 @@ uint32_t decrypt_aes_wrapped_secret(uint8_t* wrappedSecret,
         printf("Secret decryption failed!");
         return ret_code;
     }
-/*
-    uint8_t *plaintext_printable = (uint8_t *)malloc (plaintext_len);
-    if (!plaintext_printable) {
-	 printf("Plaintext Printable buffer memory allocation failed.");
-	 return -1;
-    }
 
-    memcpy(plaintext_printable, *plaintext, plaintext_len);
-
-    plaintext_printable[plaintext_len] = '\0';
-*/
     printf("Secret unwrapped successfully...");
-
     return 0;
 }
 
