@@ -20,7 +20,7 @@ const (
 	envLogLevel                 = "LOG_LEVEL"
 	envSanList                  = "SAN_LIST"
 	envSkipTlsVerification      = "SKIP_TLS_VERIFICATION"
-	envHttpClientTimeoutSeconds = "HTTP_CLIENT_TIMEOUT_IN_SECONDS"
+	envHttpReadHeaderTimeoutSec = "HTTP_READ_HEADER_TIMEOUT_IN_SECONDS"
 
 	envTrustAuthorityAPIUrl = "TRUSTAUTHORITY_API_URL"
 	envTrustAuthorityAPIKey = "TRUSTAUTHORITY_API_KEY"
@@ -37,7 +37,7 @@ type Configuration struct {
 	LogCaller           bool
 	LogLevel            log.Level
 	SkipTLSVerification bool
-	HTTPClientTimeout   int
+	HTTPReadHdrTimeout  int
 
 	TrustAuthorityUrl string
 	TrustAuthorityKey string
@@ -61,7 +61,7 @@ func NewConfigFromEnv() (*Configuration, error) {
 	viper.SetDefault("LogCaller", "false")
 	viper.SetDefault("SanList", defaultSanList)
 	viper.SetDefault("SkipTlsVerification", "true")
-	viper.SetDefault("HTTPClientTimeout", defaultHttpTimeout)
+	viper.SetDefault("HTTPReadHdrTimeout", defaultHttpTimeout)
 
 	// map structure field names to env var names (log level is handled manually below)
 	envBinding := map[string]string{
@@ -69,7 +69,7 @@ func NewConfigFromEnv() (*Configuration, error) {
 		"SanList":             envSanList,
 		"LogCaller":           envEnableLogCaller,
 		"SkipTLSVerification": envSkipTlsVerification,
-		"HTTPClientTimeout":   envHttpClientTimeoutSeconds,
+		"HTTPReadHdrTimeout":  envHttpReadHeaderTimeoutSec,
 		"TrustAuthorityUrl":   envTrustAuthorityAPIUrl,
 		"TrustAuthorityKey":   envTrustAuthorityAPIKey,
 	}
@@ -103,7 +103,7 @@ func NewConfigFromEnv() (*Configuration, error) {
 		"LogLevel":            conf.LogLevel,
 		"LogCaller":           conf.LogCaller,
 		"SkipTLSVerification": conf.SkipTLSVerification,
-		"HTTPClientTimeout":   conf.HTTPClientTimeout,
+		"HTTPReadHdrTimeout":  conf.HTTPReadHdrTimeout,
 		"TrustAuthorityUrl":   conf.TrustAuthorityUrl,
 	}).Info("Parse configs from environment")
 

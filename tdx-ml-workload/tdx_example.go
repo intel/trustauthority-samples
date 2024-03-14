@@ -82,8 +82,9 @@ func main() {
 	}
 
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf(":%d", conf.Port),
-		Handler: httpHandlers,
+		Addr:              fmt.Sprintf(":%d", conf.Port),
+		Handler:           httpHandlers,
+		ReadHeaderTimeout: time.Duration(conf.HTTPReadHdrTimeout) * time.Second,
 	}
 
 	// TLS support is enabled
