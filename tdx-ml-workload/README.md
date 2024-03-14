@@ -4,19 +4,21 @@
 
 make
 
-## Usage
+Requires **Go 1.21 or newer**. See https://go.dev/doc/install for installation of Go.
+
+## Pre-requisites
 
 **Create TDX Key Transfer Policy on KBS**
 
 **Create AES 256 Key on KBS and associate it with Key Transfer Policy**
 
-**Encrypt the datafile using [encryptor](../encryptor)**
+**Encrypt the modelfile using [encryptor](../encryptor)**
 
-**Push the encrypted datafile under /etc/ on TDVM**
+**Push the encrypted modelfile under /etc/ on TDVM**
 
-**Install [TDX CLI](https://github.com/intel/trustauthority-client-for-go/blob/main/tdx-cli/README.md#installation)**
+**Install [TDX CLI](https://github.com/intel/trustauthority-client-for-go/blob/main/tdx-cli/README.md#installation) within TDVM**
 
-**Install TrustAuthority Demo App**
+## Install TrustAuthority Demo App within TDVM**
 
 Create trustauthority-demo.env file under /tmp/ with below contents :
 
@@ -24,9 +26,15 @@ TRUSTAUTHORITY_API_URL=https://api.trustauthority.intel.com <br>
 TRUSTAUTHORITY_API_KEY=<trustauthority api key> <br>
 HTTPS_PROXY=<proxy if any> <br>
 
-**./trustauthority-demo-v1.0.0.bin**
+Copy the bin installer into TDVM and invoke the installer
 
-## API Spec
+**sudo ./trustauthority-demo-v1.0.0.bin**
+
+Post successful installation, the trustauthority-demo service should be in running state
+
+**systemctl status trustauthority-demo**
+
+## Usage
 
 ### Get attestation token
 

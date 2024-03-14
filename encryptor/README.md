@@ -4,6 +4,8 @@
 
 go build encrypt.go
 
+Requires **Go 1.21 or newer**. See https://go.dev/doc/install for installation of Go.
+
 ## Usage
 
 encrypt <data_file> <private_key_file> <wrapped_dek_file>
