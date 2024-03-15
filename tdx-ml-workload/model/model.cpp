@@ -35,6 +35,7 @@ uint32_t aes_256gcm_decrypt(const aes_gcm_256bit_key_t *p_key, const uint8_t *p_
      {
 	  return 1;
      }
+
      int len = 0;
      uint32_t ret = -1;
      EVP_CIPHER_CTX * pState = NULL;
@@ -144,6 +145,7 @@ uint32_t decrypt_aes_wrapped_secret(uint8_t* wrappedSecret,
 				  0, // AAD Length
 				  &mac); // MAC
 
+      memset(sk_key, 0, AESGCM_256_KEY_SIZE);
       free(sk_key);
       sk_key = NULL;
     if (0 != ret_code) {
@@ -162,45 +164,47 @@ int model_decrypt(uint8_t* wrapped_model,
                     uint8_t* swk)
 {
     uint32_t ret_code = 0;
-    uint8_t* data = NULL;
+    uint8_t* dek = NULL;
+    uint8_t* model = NULL;
 
     ret_code = decrypt_aes_wrapped_secret(wrapped_dek,
                               wrapped_dek_size,
                               swk,
-                              &data);
+                              &dek);
 
     if (ret_code != 0) {
         printf("Decryption of DEK failed. Check error code.");
-        if (data != NULL) {
-          free(data);
-          data = NULL;
+        if (dek != NULL) {
+          memset(dek, 0, wrapped_dek_size - (SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE));
+          free(dek);
+          dek = NULL;
         }
         return ret_code;
     }
 
     std::cout << "Successfully decrypted DEK.";
 
-    swk = data;
-
     ret_code = decrypt_aes_wrapped_secret(wrapped_model,
                               wrapped_model_size,
-                              swk,
-                              &data);
+                              dek,
+                              &model);
 
-      free(swk);
-      swk = NULL;
+      memset(dek, 0, wrapped_dek_size - (SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE));
+      free(dek);
+      dek = NULL;
     if (ret_code != 0) {
         printf("Decryption of model failed. Check error code.");
-        if (data != NULL) {
-          free(data);
-          data = NULL;
+        if (model != NULL) {
+          memset(model, 0, wrapped_model_size - (SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE));
+          free(model);
+          model = NULL;
         }
         return ret_code;
     }
 
     std::cout << "Successfully decrypted Model.";
 
-    aimodelbuffer = (char *)data;
+    aimodelbuffer = (char *)model;
 
     return 0;
 }

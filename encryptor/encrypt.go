@@ -16,12 +16,45 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io"
+	"math/big"
 	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
+
+// zeroizeByteArray overwrites a byte array's data with zeros
+func zeroizeByteArray(bytes []byte) {
+	for i, _ := range bytes {
+		bytes[i] = 0
+	}
+}
+
+// zeroizeBigInt replaces the big integer's byte array with
+// zeroes.  This function will panic if the bigInt parameter is nil.
+func zeroizeBigInt(bigInt *big.Int) {
+	if bigInt == nil {
+		panic("The bigInt parameter cannot be nil")
+	}
+
+	bytes := make([]byte, len(bigInt.Bytes()))
+	bigInt.SetBytes(bytes)
+}
+
+// zeroizeRSAPrivateKey clears the private key's "D" and
+// "Primes" (big int) values.  This function will panic if the privateKey
+// parameter is nil.
+func zeroizeRSAPrivateKey(privateKey *rsa.PrivateKey) {
+	if privateKey == nil {
+		panic("The private key parameter cannot be nil")
+	}
+
+	zeroizeBigInt(privateKey.D)
+	for _, bigInt := range privateKey.Primes {
+		zeroizeBigInt(bigInt)
+	}
+}
 
 func Encrypt(modelPath string, privateKeyLocation string, encryptedFileLocation string, wrappedKey []byte) error {
 
@@ -35,6 +68,7 @@ func Encrypt(modelPath string, privateKeyLocation string, encryptedFileLocation 
 	if err != nil {
 		return errors.Wrap(err, "Error while unwrapping the key")
 	}
+	defer zeroizeByteArray(key)
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -69,16 +103,19 @@ func UnwrapKey(wrappedKey []byte, privateKeyLocation string) ([]byte, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "Error reading private key file")
 	}
+	defer zeroizeByteArray(privateKey)
 
 	privateKeyBlock, _ := pem.Decode(privateKey)
 	if privateKeyBlock == nil {
 		return nil, errors.New("private key not found")
 	}
+	defer zeroizeByteArray(privateKeyBlock.Bytes)
 
 	pri, err := x509.ParsePKCS1PrivateKey(privateKeyBlock.Bytes)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error decoding private key")
 	}
+	defer zeroizeRSAPrivateKey(pri)
 
 	decryptedKey, err := rsa.DecryptOAEP(sha512.New384(), rand.Reader, pri, wrappedKey, nil)
 	if err != nil {
