@@ -11,14 +11,11 @@ WORKDIR /app
 
 RUN git clone -b containerization-sample  https://github.com/pravinrajr9/applications.security.amber.trustauthority-samples.git trustauthority-samples
 
-ENV CGO_CFLAGS_ALLOW="-f.*"
-ENV CGO_CFLAGS="-O2 -D_FORTIFY_SOURCE=2"
-
 RUN cd trustauthority-samples && GITCOMMIT=$(git describe --always); \
         VERSION=${VERSION:-v0.0.0}; \
         BUILDDATE=$(TZ=UTC date +%Y-%m-%dT%H:%M:%S%z); \
-        cd tdx-ml-workload && go build -buildmode=pie -trimpath \
-    -ldflags "-s -linkmode=external -extldflags '-Wl,-O1,-z,relro,-z,now' -X github.com/intel/trustauthority-samples/tdxexample/version.BuildDate=${BUILDDATE} -X github.com/intel/trustauthority-samples/tdxexample/version.Version=${VERSION} -X github.com/intel/trustauthority-samples/tdxexample/version.GitHash=${GITCOMMIT}" \
+        cd tdx-ml-workload && env  CGO_CFLAGS_ALLOW="-f.*"  CGO_CFLAGS="-O2 -D_FORTIFY_SOURCE=2" \
+	go build -buildmode=pie -trimpath -ldflags "-s -linkmode=external -extldflags '-Wl,-O1,-z,relro,-z,now' -X github.com/intel/trustauthority-samples/tdxexample/version.BuildDate=${BUILDDATE} -X github.com/intel/trustauthority-samples/tdxexample/version.Version=${VERSION} -X github.com/intel/trustauthority-samples/tdxexample/version.GitHash=${GITCOMMIT}" \
     -o trustauthority-demo
 
 RUN cd /app/trustauthority-samples/encryptor && go build encrypt.go
