@@ -1,24 +1,30 @@
-# TrustAuthority Demo
+# Quickstart App Example to demonstrate Secure Key Release use-case on Intel® TDX
+This is a sample confidential computing workload for Intel® Trust Domain Extensions (Intel® TDX) to demonstrate the secure key release use-case and the passport attestation model. The sample is provided in two Docker containers, a relying party and an attesting workload. Intel® Trust Authority is the verifier. The Dockerfiles for easy deployment is available in [deployment](../deployment) folder.
 
 ## Build
+To build the Quickstart App Example, invoke `make` command on terminal.
 
-make
+> [!Note]
+> Make sure you have `makeself` and `Go` installed before building the application.
 
 Requires **Go 1.21 or newer**. See https://go.dev/doc/install for installation of Go.
 
+> [!Note]
+> If you are using Dockerfiles deployment, jump to [Usage](#usage) section.
+
 ## Pre-requisites
 
-**Create TDX Key Transfer Policy on KBS**
+1. Create TDX Key Transfer Policy on KBS
 
-**Create AES 256 Key on KBS and associate it with Key Transfer Policy**
+1. Create AES 256 Key on KBS and associate it with Key Transfer Policy
 
-**Encrypt the modelfile using [encryptor](../encryptor)**
+1. Encrypt the modelfile using [encryptor](../encryptor)
 
-**Push the encrypted modelfile under /etc/ on TDVM**
+1. Push the encrypted modelfile under /etc/ on TDVM
 
-**Install [TDX CLI](https://github.com/intel/trustauthority-client-for-go/blob/main/tdx-cli/README.md#installation) within TDVM**
+1. Install [TDX CLI](https://github.com/intel/trustauthority-client-for-go/blob/main/tdx-cli/README.md#installation) within TDVM
 
-## Install TrustAuthority Demo App within TDVM**
+## Install Quickstart Demo App within TDVM
 
 Create trustauthority-demo.env file under /tmp/ with below contents :
 
@@ -28,13 +34,20 @@ HTTPS_PROXY=<proxy if any> <br>
 
 Copy the bin installer into TDVM and invoke the installer
 
-**sudo ./trustauthority-demo-v1.0.0.bin**
+```shell
+sudo ./trustauthority-demo-v1.0.0.bin
+```
 
-Post successful installation, the trustauthority-demo service should be in running state
+Post successful installation, the `trustauthority-demo` service should be in running state
 
-**systemctl status trustauthority-demo**
+```shell
+systemctl status trustauthority-demo
+``````
 
-## Usage
+> [!Note]
+> Make sure to remove the trustauthority-demo.env file post successful installation.
+
+## Usage 
 
 ### Get attestation token
 
@@ -165,3 +178,9 @@ Request JSON :
     ``` json
       {"high-risk":0}
     ```
+
+## Security Considerations
+1. This demo application does not have any authentication/authorization in-place. All the API end-points are public and runs on HTTPS.
+1. This demo application supports TLS 1.3 or higher. It generates self-signed TLS certificates when not passed explicitly.
+1. All the application logs are stored in systemd journal and the same can be retrieved using `journalctl` command.
+1. All the application data is stored under /opt/trustauthority-demo/ folder. Disable the service and remove the /opt/trustauthority-demo/ folder for cleanup.

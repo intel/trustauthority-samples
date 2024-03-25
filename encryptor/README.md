@@ -1,8 +1,11 @@
-# Encryption Tool 
+# Encryptor
+This is a utility program to encrypt the data using the wrapped DEK retrieved from KBS.
 
 ## Build
 
+```shell
 go build encrypt.go
+```
 
 Requires **Go 1.21 or newer**. See https://go.dev/doc/install for installation of Go.
 
@@ -10,25 +13,27 @@ Requires **Go 1.21 or newer**. See https://go.dev/doc/install for installation o
 
 encrypt <data_file> <private_key_file> <wrapped_dek_file>
 
-Eg : 
-
-**encrypt diabetes-linreg.model keypair.pem wrapped-key**
-
 ## Data Encryption Steps
 
 ### Generate RSA key-pair using openssl
 
-`openssl genrsa -out keypair.pem 2048`
+```shell
+openssl genrsa -out keypair.pem 2048
+```
   
 ### Extract public key
 
-`openssl rsa -in keypair.pem -pubout -out public.crt`
+```shell
+openssl rsa -in keypair.pem -pubout -out public.crt
+```
 
 ### Get DEK from KBS using public key
-Get the auth token from KBS before requesting key transfer
+
+> [!Note]
+> Get the auth token from KBS before requesting dek.
 
 * **URL**
-`https://{{kbs}}:9443/kbs/v1/keys/<key_id>`
+`https://{{kbs-ip}}:9443/kbs/v1/keys/<key_id>`
 
 * **Method:**
 
@@ -67,5 +72,15 @@ NQIDAQAB
 * **Error Response:**
   * **Code:** 404 NOT FOUND <br />
 
+Save the wrapped DEK from KBS in a file for running encryption tool later.
+
 ### Encrypt data
 Execute **encrypt** binary with required args
+
+```shell
+./encrypt diabetes-linreg.model keypair.pem wrapped.key
+```
+
+## Security Considerations
+1. This encryption tool needs to be run in a secure environment. In real world, encryption operation happens on enterprise side.
+1. Make sure to remove the data file and private key post running encryptor.
