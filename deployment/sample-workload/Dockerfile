@@ -4,7 +4,7 @@ COPY .netrc /root/.netrc
 
 ARG VERSION
 
-RUN apt-get update && apt-get install -y libssl-dev
+RUN apt-get update && apt-get install --no-install-recommends -y libssl-dev
 
 # Build the trustauthority-demo
 WORKDIR /app

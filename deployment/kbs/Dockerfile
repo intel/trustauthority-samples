@@ -19,9 +19,7 @@ RUN git clone -b containerization-sample  https://github.com/pravinrajr9/applica
 
 FROM ubuntu:22.04 AS final
 
-RUN apt-get update && apt-get install -y \
-    python3-pip \
-    openssl
+RUN apt-get update && apt-get install -y --no-install-recommends python3-pip openssl
 
 # Install PyKMIP and its dependencies
 RUN pip3 install pykmip
