@@ -60,7 +60,7 @@ func NewConfigFromEnv() (*Configuration, error) {
 	viper.SetDefault("Port", defaultPort)
 	viper.SetDefault("LogCaller", "false")
 	viper.SetDefault("SanList", defaultSanList)
-	viper.SetDefault("SkipTlsVerification", "true")
+	viper.SetDefault("SkipTlsVerification", "false")
 	viper.SetDefault("HTTPReadHdrTimeout", defaultHttpTimeout)
 
 	// map structure field names to env var names (log level is handled manually below)

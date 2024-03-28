@@ -36,7 +36,7 @@ echo "Installing Intel Trust Authority Demo Application..."
 PRODUCT_HOME=/opt/$COMPONENT_NAME
 BIN_PATH=$PRODUCT_HOME/bin
 
-for directory in $BIN_PATH; do
+for directory in $PRODUCT_HOME $BIN_PATH; do
     mkdir -p $directory
     if [ $? -ne 0 ]; then
         echo "Cannot create directory: $directory"
@@ -49,7 +49,7 @@ done
 # Install systemd script
 systemctl stop $COMPONENT_NAME >/dev/null 2>&1
 systemctl disable $COMPONENT_NAME.service >/dev/null 2>&1
-cp $COMPONENT_NAME.service $PRODUCT_HOME && chown $SERVICE_USERNAME:$SERVICE_USERNAME $PRODUCT_HOME/$COMPONENT_NAME.service && chown $SERVICE_USERNAME:$SERVICE_USERNAME $PRODUCT_HOME
+cp $COMPONENT_NAME.service $TLS_CERT_PATH $TLS_KEY_PATH $PRODUCT_HOME && chown $SERVICE_USERNAME:$SERVICE_USERNAME $PRODUCT_HOME/*
 
 cp $COMPONENT_NAME $BIN_PATH/ && chown $SERVICE_USERNAME:$SERVICE_USERNAME $BIN_PATH/*
 chmod 700 $BIN_PATH/*
@@ -75,7 +75,7 @@ else
     SYSD_CONF=$PRODUCT_HOME/$COMPONENT_NAME.service
     echo "Environment=TRUSTAUTHORITY_API_URL=$TRUSTAUTHORITY_API_URL" >> $SYSD_CONF
     echo "Environment=TRUSTAUTHORITY_API_KEY=$TRUSTAUTHORITY_API_KEY" >> $SYSD_CONF
-    echo "Environment=HTTP_PROXY=$HTTP_PROXY" >> $SYSD_CONF
+    echo "Environment=SKIP_TLS_VERIFICATION=$SKIP_TLS_VERIFICATION" >> $SYSD_CONF
     echo "Environment=HTTPS_PROXY=$HTTPS_PROXY" >> $SYSD_CONF
     chown $SERVICE_USERNAME:$SERVICE_USERNAME $SYSD_CONF
     systemctl daemon-reload

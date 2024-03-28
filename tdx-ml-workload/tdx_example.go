@@ -51,11 +51,13 @@ func main() {
 	}
 
 	// Initialize http client
+	tlsConfig := &tls.Config{}
+	if conf.SkipTLSVerification {
+		tlsConfig.InsecureSkipVerify = true
+	}
 	httpClient := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
+			TLSClientConfig: tlsConfig,
 		},
 	}
 
@@ -85,9 +87,16 @@ func main() {
 		Addr:              fmt.Sprintf(":%d", conf.Port),
 		Handler:           httpHandlers,
 		ReadHeaderTimeout: time.Duration(conf.HTTPReadHdrTimeout) * time.Second,
+		TLSConfig: &tls.Config{
+			MinVersion: tls.VersionTLS13,
+			CipherSuites: []uint16{tls.TLS_AES_256_GCM_SHA384,
+				tls.TLS_AES_128_GCM_SHA256,
+				// TLS_AES_128_CCM_SHA256 is not supported by go crypto/tls package
+				tls.TLS_CHACHA20_POLY1305_SHA256},
+		},
 	}
 
-	// TLS support is enabled
+	// TLS certificate is passed
 	if _, err := os.Stat(DefaultTLSCertPath); os.IsNotExist(err) {
 		// TLS certificate and key does not exist, so creating the cert and key
 		err = generateTLSKeyandCert(DefaultTLSCertPath, DefaultTLSKeyPath, conf.SanList)
@@ -96,15 +105,6 @@ func main() {
 		}
 	}
 	log.Debugf("Starting HTTPS server with TLS cert: %s", DefaultTLSCertPath)
-
-	tlsConfig := &tls.Config{
-		MinVersion: tls.VersionTLS13,
-		CipherSuites: []uint16{tls.TLS_AES_256_GCM_SHA384,
-			tls.TLS_AES_128_GCM_SHA256,
-			// TLS_AES_128_CCM_SHA256 is not supported by go crypto/tls package
-			tls.TLS_CHACHA20_POLY1305_SHA256},
-	}
-	httpServer.TLSConfig = tlsConfig
 
 	if err := httpServer.ListenAndServeTLS(DefaultTLSCertPath, DefaultTLSKeyPath); err != nil {
 		panic(err)
