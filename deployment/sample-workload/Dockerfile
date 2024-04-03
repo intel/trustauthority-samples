@@ -4,8 +4,6 @@ COPY .netrc /root/.netrc
 
 ARG VERSION
 
-RUN apt-get update && apt-get install --no-install-recommends -y libssl-dev
-
 # Build the trustauthority-demo
 WORKDIR /app
 
@@ -40,7 +38,19 @@ ENV CLI_VERSION=v1.2.0
 # Download tdx-cli
 RUN curl -L https://raw.githubusercontent.com/intel/trustauthority-client-for-go/main/release/install-tdx-cli-dcap.sh |  bash -
 
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+ARG USERNAME=sample-workload
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
+
 RUN mkdir -p /opt/trustauthority-demo/ && \
     chmod +x /app/encrypt-model.sh /app/entrypoint.sh
 
+RUN touch /etc/model.enc
+
+RUN chown -R $USER_GID:$USER_GID /usr/local/bin/encrypt /app/trustauthority-demo /opt/trustauthority-demo/ /app/ /etc/model.enc /usr/bin/trustauthority-cli
+
+USER $USERNAME
 ENTRYPOINT ["/app/entrypoint.sh"]
