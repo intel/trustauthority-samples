@@ -3,24 +3,26 @@
 
 FROM golang:1.21.6-bullseye AS builder
 
-ARG VERSION
 WORKDIR /app
 
 RUN git clone -b main https://github.com/intel/trustauthority-kbs.git
-RUN cd trustauthority-kbs && GITTAG=$(git describe --tags --abbrev=0 2>/dev/null); \
-        GITCOMMIT=$(git describe --always); \
-                VERSION=${VERSION:-v0.0.0}; \
-                BUILDDATE=$(TZ=UTC date +%Y-%m-%dT%H:%M:%S%z); \
+RUN cd trustauthority-kbs && GITCOMMIT=$(git describe --always); \
+        VERSION=${VERSION:-v0.0.0}; \
+        BUILDDATE=$(TZ=UTC date +%Y-%m-%dT%H:%M:%S%z); \
         cd cmd && env GOOS=linux CGO_CPPFLAGS="-D_FORTIFY_SOURCE=2" \
         go build -buildmode=pie -trimpath \
-                -ldflags "-linkmode=external -s -extldflags '-Wl,-z,relro,-z,now' -X intel/kbs/v1/version.BuildDate=${BUILDDATE} -X intel/kbs/v1/version.Version=${VERSION} -X intel/kbs/v1/version.GitHash=${GITCOMMIT}" \
-                -o kbs
+        -ldflags "-linkmode=external -s -extldflags '-Wl,-z,relro,-z,now' -X intel/kbs/v1/version.BuildDate=${BUILDDATE} -X intel/kbs/v1/version.Version=${VERSION} -X intel/kbs/v1/version.GitHash=${GITCOMMIT}" \
+        -o kbs
 
-RUN git clone -b main https://github.com/intel/trustauthority-samples.git trustauthority-samples
+RUN git clone -b task/dockerfile-deployment https://github.com/arvind5/trustauthority-samples.git trustauthority-samples
 
 FROM ubuntu:22.04 AS final
 
 RUN apt-get update && apt-get install -y --no-install-recommends python3-pip openssl
+
+# Install ca-certificates package to get the system certificates
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install PyKMIP and its dependencies
 RUN pip3 install pykmip
@@ -30,10 +32,6 @@ WORKDIR /etc/pykmip/
 COPY --from=builder /app/trustauthority-samples/deployment/kbs/server.conf .
 COPY --from=builder /app/trustauthority-samples/deployment/kbs/generate-pykmip-certs.sh .
 RUN chmod +x generate-pykmip-certs.sh && ./generate-pykmip-certs.sh
-
-# Install ca-certificates package to get the system certificates
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
 

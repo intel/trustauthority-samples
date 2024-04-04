@@ -111,13 +111,13 @@ func UnwrapKey(wrappedKey []byte, privateKeyLocation string) ([]byte, error) {
 	}
 	defer zeroizeByteArray(privateKeyBlock.Bytes)
 
-	pri, err := x509.ParsePKCS1PrivateKey(privateKeyBlock.Bytes)
+	pri, err := x509.ParsePKCS8PrivateKey(privateKeyBlock.Bytes)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error decoding private key")
 	}
-	defer zeroizeRSAPrivateKey(pri)
+	defer zeroizeRSAPrivateKey(pri.(*rsa.PrivateKey))
 
-	decryptedKey, err := rsa.DecryptOAEP(sha512.New384(), rand.Reader, pri, wrappedKey, nil)
+	decryptedKey, err := rsa.DecryptOAEP(sha512.New384(), rand.Reader, pri.(*rsa.PrivateKey), wrappedKey, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error while decrypting the key")
 	}
