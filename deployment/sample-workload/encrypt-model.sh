@@ -1,6 +1,5 @@
 #!/bin/bash
 
-echo "Encrypting the model before use"
 # Remove extra "/" at end of url
 KBS_URL="${KBS_URL%/}"
 
@@ -96,4 +95,9 @@ echo "$wrapped_key" > wrappedKey
 # Push the encrypted datafile under /etc/
 cp model.enc /etc/
 
-echo "Note the key_id: "$key_id" needed for model decryption later in /v1/key end-point of workload"
+# Generate execute_workload_flow.env for workflow script
+cat <<EOF > /tmp/execute_workload_flow.env
+WORKLOAD_URL=https://127.0.0.1:12780
+KBS_URL=${KBS_URL}
+KBS_KEY_ID=$key_id
+EOF

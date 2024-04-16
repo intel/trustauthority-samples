@@ -14,7 +14,7 @@ RUN cd trustauthority-kbs && GITCOMMIT=$(git describe --always); \
         -ldflags "-linkmode=external -s -extldflags '-Wl,-z,relro,-z,now' -X intel/kbs/v1/version.BuildDate=${BUILDDATE} -X intel/kbs/v1/version.Version=${VERSION} -X intel/kbs/v1/version.GitHash=${GITCOMMIT}" \
         -o kbs
 
-RUN git clone -b task/dockerfile-deployment https://github.com/arvind5/trustauthority-samples.git trustauthority-samples
+RUN git clone -b main https://github.com/intel/trustauthority-samples.git
 
 FROM ubuntu:22.04 AS final
 

@@ -5,7 +5,7 @@ FROM golang:1.21.6-bullseye AS builder
 
 WORKDIR /app
 
-RUN git clone -b task/dockerfile-deployment https://github.com/arvind5/trustauthority-samples.git trustauthority-samples
+RUN git clone -b main https://github.com/intel/trustauthority-samples.git
 RUN cd trustauthority-samples && GITCOMMIT=$(git describe --always); \
         VERSION=${VERSION:-v0.0.0}; \
         BUILDDATE=$(TZ=UTC date +%Y-%m-%dT%H:%M:%S%z); \

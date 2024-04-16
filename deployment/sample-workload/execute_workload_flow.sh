@@ -30,8 +30,6 @@ readonly LABEL_EXE_MODEL_DESC="Executing model with test data."
 readonly LABEL_RST_MODEL="Reset Model"
 readonly LABEL_RST_MODEL_DESC="Clearing decrypted model from memory."
 
-#link
-readonly HELP_LINK="https://github.com/arvind5/trustauthority-samples/blob/main/tdx-ml-workload/README.md"
 ##############################################################################################
 function checkIfRequireToolInstalled() {
     loc="$(type -p "$1")"
@@ -59,28 +57,28 @@ function makeHttpsCall(){
     body=$5
 
     response=''
-    
-    if [ -z "$body" ] 
+
+    if [ -z "$body" ]
     then
         response=$(curl -X $method -ksH "Accept: application/json" -w "%{http_code}" $addr)
     else
-        response=$(curl -X $method -ksH "Accept: application/json" -H "Content-Type: application/json" -w "%{http_code}" -d "$body" $addr)        
+        response=$(curl -X $method -ksH "Accept: application/json" -H "Content-Type: application/json" -w "%{http_code}" -d "$body" $addr)
     fi
-    
+
     http_code=$(tail -n1 <<< "$response")  # get the last line
     content=$(sed '$ d' <<< "$response")  # get all but the last line which contains the status code
     export $3="$content"
-    eval "$4=$http_code"  
+    eval "$4=$http_code"
 }
 
 function validateEnvironmentFile(){
     envFileName=$DEFAULT_FILE_NAME
     #Read input variable for environment file. If not exist use default file
     if [ $# -eq 1 ];then
-        envFileName=$1    
+        envFileName=$1
     fi
     printf "Using $envFileName environment file\n"
-    
+
     #check if environment file exists
     checkIfFileExists $envFileName
     if [ $? == 1 ]; then
@@ -88,41 +86,41 @@ function validateEnvironmentFile(){
         return 1
     fi
     export $(grep -v '^#' $envFileName | xargs -d '\n')
-    
+
     hasError=false
     if [[ -z "$WORKLOAD_URL" ]];then
         printf "${CODE_ERROR}%s${CODE_NC}" "WORKLOAD_URL must be present"
         hasError=true
-    fi    
+    fi
     if [[ -z "$KBS_URL" ]];then
         printf "${CODE_ERROR}%s${CODE_NC}" "KBS_URL must be present"
         hasError=true
-    fi  
+    fi
     if [[ -z $KBS_KEY_ID ]];then
         printf "${CODE_ERROR}%s${CODE_NC}" "KBS_KEY_ID must be present"
         hasError=true
-    fi  
+    fi
     if [[ $hasError == true ]];then
         printf "${CODE_ERROR} %s ${CODE_NC}" "Exiting..."
         return 1
-    fi  
+    fi
 }
 
 #Prerequisite check for curl, jq
 checkIfRequireToolInstalled "curl"
 if [ $? == 1 ]; then
-    echo -e "\u274c  curl is not installed, exiting... Please install curl and rerun script" 
-    exit 1   
-else 
-    echo -e "\u2714   curl is installed"    
+    echo -e "\u274c  curl is not installed, exiting... Please install curl and rerun script"
+    exit 1
+else
+    echo -e "\u2714   curl is installed"
 fi
 
 checkIfRequireToolInstalled "jq"
 if [ $? == 1 ]; then
-    echo -e "\u274c  jq is not installed, exiting... Please install jq and rerun script"    
+    echo -e "\u274c  jq is not installed, exiting... Please install jq and rerun script"
     exit 1
-else 
-    echo -e "\u2714   jq is installed"    
+else
+    echo -e "\u2714   jq is installed"
 fi
 
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
@@ -146,7 +144,7 @@ kbs_host=$KBS_URL
 key_id=$KBS_KEY_ID
 
 printf "Using Workload Host url : $server_addr\n"
-printf "Using KBS host url      : $kbs_host\n" 
+printf "Using KBS host url      : $kbs_host\n"
 printf "Using KBS Key id        : $key_id\n"
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
 
