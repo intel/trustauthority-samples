@@ -43,7 +43,6 @@ func (mw loggingMiddleware) GetAttestationToken(ctx context.Context) (*GetAttest
 func (svc service) GetAttestationToken(_ context.Context) (*GetAttestationTokenResponse, error) {
 
 	var policyIds string
-	//policyIds = append(policyIds, uuid.MustParse("3910b351-5865-4fb2-a731-17c6793cd4ca"))
 	cmd := exec.Command(CLI, "token", "--config", "config.json", "--user-data", svc.userData, "--policy-ids", policyIds, "--no-eventlog")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
