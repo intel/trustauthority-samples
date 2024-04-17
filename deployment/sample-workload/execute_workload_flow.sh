@@ -2,9 +2,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 
-# Script is used for executing workload flow
-# Runing script:
-# execute_workload_flow.sh <optional_env_file>
+# Script for executing workload flow
+# Running script:
+# bash execute_workload_flow.sh <optional_env_file>
 # optional_env_file: Optional environment file path. Default is /tmp/execute_workload_flow.env
 
 ############################### Constants ###############################################################
@@ -15,17 +15,17 @@ readonly CODE_NC='\033[0m' #NO_COLOR`
 readonly DEFAULT_FILE_NAME="/tmp/execute_workload_flow.env"
 
 #labels and description
-readonly LABEL_GET_ATT_TOKEN="Get attestation token"
-readonly LABEL_GET_ATT_TOKEN_DESC="Attesting workload with Intel Trust Authority."
+readonly LABEL_GET_ATT_TOKEN="Get Attestation token from Intel Trust Authority"
+readonly LABEL_GET_ATT_TOKEN_DESC="Attesting TDX workload with Intel Trust Authority by submitting TDquote."
 
-readonly LABEL_GET_DESC_KEY="Get decryption key"
-readonly LABEL_GET_DESC_KEY_DESC="Requesting encryption key from KBS."
+readonly LABEL_GET_DESC_KEY="Get decryption key from KBS"
+readonly LABEL_GET_DESC_KEY_DESC="Requesting decryption key from KBS by sending Attestation token obtained in previous step."
 
 readonly LABEL_DECRYPT_KEY="Decrypt model"
-readonly LABEL_DECRYPT_KEY_DESC="Decrypting Model using encryption key from KBS."
+readonly LABEL_DECRYPT_KEY_DESC="Decrypting Model using decryption key recieved from KBS."
 
 readonly LABEL_EXE_MODEL="Execute model"
-readonly LABEL_EXE_MODEL_DESC="Executing model with test data."
+readonly LABEL_EXE_MODEL_DESC="Executing model with sample test data."
 
 readonly LABEL_RST_MODEL="Reset Model"
 readonly LABEL_RST_MODEL_DESC="Clearing decrypted model from memory."
@@ -152,15 +152,16 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
 return_var=''
 #Variable for returning code
 return_code=''
+
 #Get token
 url=$server_addr/taa/v1/token
-
 printf "\n\n"
 printf "${TITLE} ${LABEL_GET_ATT_TOKEN}: ${CODE_NC}${LABEL_GET_ATT_TOKEN_DESC}\n\n"
 sleep 5
 printf "%*s %s\n" ${#label_expected_code} "$label_url" "| $url"
 printf "%*s %s\n" ${#label_expected_code} "$label_method" "| GET"
 printf "%*s %s\n" ${#label_expected_code} "$label_expected_code" "| 200"
+
 makeHttpsCall $url GET return_var return_code
 if [ $return_code -ne 200 ]; then
     printf "%*s ${CODE_ERROR}%s${CODE_NC}\n" ${#label_expected_code} "$label_received_code" "| Received unexpected status $return_code, exiting..."
@@ -181,7 +182,6 @@ requestForKey=$( jq -n \
                   --arg kturl "$kbs_host/keys/$key_id/transfer" \
                   '{attestation_token: $at, key_transfer_url: $kturl}' )
 url=$server_addr/taa/v1/key
-
 printf "\n${TITLE} ${LABEL_GET_DESC_KEY}: ${CODE_NC}${LABEL_GET_DESC_KEY_DESC}\n\n"
 sleep 5
 printf "%*s %s\n" ${#label_expected_code} "$label_url" "| $url"

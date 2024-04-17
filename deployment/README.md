@@ -1,4 +1,4 @@
-# Build and Deployment of Intel® Key Broker Service and Intel TDX Demo App
+# Build and Deployment of Intel® Key Broker Service and Intel® TDX Demo App
 
 These instructions describe how to build and deploy the two Docker containers comprising the Intel® Trust Domain Extensions (Intel TDX) demonstration application. For more information about the secure key release workflow and the demo app, see [Key release and workload for Intel TDX](https://docs.trustauthority.intel.com/articles/tutorial-tdx-workload.html).
 
@@ -31,7 +31,6 @@ This section describes how to build and deploy the Intel KBS relying party conta
    ```bash
    wget https://raw.githubusercontent.com/intel/trustauthority-samples/main/deployment/kbs/kbs.env
    ```
-
    When the relying-party container is run, a startup script configures Intel KBS to use the `ADMIN_USERNAME` and `ADMIN_PASSWORD` provided in the **kbs.env** file. You'll also need to provide an attestation API key for `TRUSTAUTHORITY_API_KEY`, which you can get from the Intel Trust Authority [portal](https://portal.trustauthority.intel.com). You might also need to configure an HTTPS proxy, depending on your network configuration. In the following sample kbs.env file, you should replace the parameters marked with angle brackets, for example `<admin-username>`.
 
    ```
@@ -46,11 +45,12 @@ This section describes how to build and deploy the Intel KBS relying party conta
    KMIP_CLIENT_CERT_PATH=/etc/pykmip/client_certificate.pem
    KMIP_ROOT_CERT_PATH=/etc/pykmip/ca_certificate.pem
    PYKMIP_LOG_LEVEL=info
-   HTTPS_PROXY=<proxy url if required>
+   HTTPS_PROXY=
    TRUSTAUTHORITY_BASE_URL=https://portal.trustauthority.intel.com
    TRUSTAUTHORITY_API_URL=https://api.trustauthority.intel.com
    TRUSTAUTHORITY_API_KEY=<API Key>
    ```
+
    > [!NOTE]
    > The kbs.env file contains secrets, such as the Intel KBS administrator password, the KMS password or access token, and an Intel Trust Authority attestation API key. For a secure production system, you should delete the kbs.env file after initial configuration to avoid compromising the configuration secrets. However, for this demo it's not necessary to delete the kbs.env, unless you want to protect the API key.
 
@@ -58,7 +58,6 @@ This section describes how to build and deploy the Intel KBS relying party conta
    ```bash
    sudo docker run --name relying-party -d --env-file kbs.env --restart=always -p 9443:9443 relying-party:latest
    ```
-
    9443 is the port Intel KBS will listen on. The port can be changed, if necessary.
 
 ## Intel TDX Demo workload
@@ -102,13 +101,13 @@ This section describes how to build and deploy the demonstration workload. The w
    KBS_PASSWORD=<KBS-admin-password>
    KBS_URL=https://<IP_address>:9443/kbs/v1
    SKIP_TLS_VERIFICATION=<true | false>
-   HTTPS_PROXY=<proxy URL if required>
+   HTTPS_PROXY=
    TRUSTAUTHORITY_API_URL=https://api.trustauthority.intel.com
    TRUSTAUTHORITY_API_KEY=<API Key>
    ```
 2. Run the following command to start the demo workload as a Docker container.
    ```bash
-   sudo docker run --name ita-demo -d --env-file workload.env --device=/dev/tdx_guest -p 12780:12780 --user 0 trustauthority-demo:latest
+   sudo docker run --name ita-demo -d --env-file workload.env --device=/dev/tdx_guest -v /tmp:/tmp -p 12780:12780 --user 0 trustauthority-demo:latest
    ```
    On successful run, the container will generate a `execute_workload_flow.env` file in the `/tmp/` folder. This env file will be used later for executing the workload flow script. Update the env variables in the `execute_workload_flow.env` file if you used custom settings.
 
@@ -124,12 +123,12 @@ This section describes how to build and deploy the demonstration workload. The w
 > crw-rw---- 1 root <user-group> 10, 123 /dev/tdx_guest
 > ```
 
-### Execute Workload Flow
+### Execute Workflow
 1. Download the [execute_workload_flow.sh](./sample-workload/execute_workload_flow.sh) script for executing secure key release workflow.
    ```bash
    wget https://raw.githubusercontent.com/intel/trustauthority-samples/main/deployment/sample-workload/execute_workload_flow.sh
    ```
-2. Run the following command to execute the workload flow script.
+2. Run the following command to execute the workflow script.
    ```bash
    bash execute_workload_flow.sh
    ```
