@@ -1,4 +1,5 @@
 name: OnMergeRelease
+permissions: read-all
 
 on:
   push:

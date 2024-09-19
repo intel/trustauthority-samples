@@ -1,4 +1,5 @@
 name: OnPullRequest
+permissions: read-all
 
 on:
   pull_request:
