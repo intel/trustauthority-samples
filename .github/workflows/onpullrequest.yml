@@ -30,4 +30,4 @@ jobs:
           fi
 
       - name: Build workload
-        run: make -C tdx-ml-workload
+        run: make -C tdx-ml-workload trustauthority-demo
