@@ -10,6 +10,7 @@ fi
 # Generate config.json for tdx cli
 cat <<EOF > /app/config.json
 {
+  "cloud_provider": "$PLATFORM",
   "trustauthority_api_url": "$TRUSTAUTHORITY_API_URL",
   "trustauthority_api_key": "$TRUSTAUTHORITY_API_KEY"
 }

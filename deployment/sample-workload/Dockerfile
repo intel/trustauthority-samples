@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 
-FROM golang:1.21.6-bullseye AS builder
+FROM golang:1.23.3-bullseye AS builder
 
 WORKDIR /app
 
@@ -39,7 +39,7 @@ COPY --from=builder /app/trustauthority-samples/deployment/sample-workload/entry
 COPY --from=builder /app/trustauthority-samples/encryptor/diabetes-linreg.model .
 
 # Install tdx-cli
-RUN apt update && curl -L https://raw.githubusercontent.com/intel/trustauthority-client-for-go/main/release/install-tdx-cli-${PLATFORM}.sh | bash -
+RUN apt update && curl -L https://raw.githubusercontent.com/intel/trustauthority-client-for-go/main/release/install-tdx-cli.sh | bash -
 
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID

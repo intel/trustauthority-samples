@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 
-FROM golang:1.21.6-bullseye AS builder
+FROM golang:1.23.3-bullseye AS builder
 
 WORKDIR /app
 

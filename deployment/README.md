@@ -23,7 +23,7 @@ This section describes how to build and deploy the Intel KBS relying party conta
    ```
 2. Run the following command to build the Docker image for Intel KBS.
    ```bash
-   sudo docker build -t relying-party .
+   sudo docker build --no-cache -t relying-party .
    ```
 
 ### Deploy
@@ -71,15 +71,9 @@ This section describes how to build and deploy the demonstration workload. The w
    ```
 2. Run the following command to build the Docker image for the TDX demo workload.
    ```bash
-   sudo docker build --build-arg PLATFORM=dcap -t trustauthority-demo .
+   sudo docker build --no-cache -t trustauthority-demo .
    ```
-   The demo workload relies on the Intel Trust Authority CLI for Intel TDX to obtain a quote and request an attestation token. The CLI requires an adapter that is specific to the platform on which the demo app is run. The 'PLATFORM' argument specifies which adapter to use:
-
-   | PLATFORM | Description |
-   |---|---|
-   | `dcap` | Installs the adapter for native Intel TDX TDs that use Intel SGX DCAP to collect a quote for attestation.|
-   | `azure` | Installs the adapter for Microsoft Azure confidential VMs with Intel TDX. |
-   | `gcp` | Installs the adapter for Google Cloud Platform confidential VMs. |
+   The demo workload relies on the Intel Trust Authority CLI for Intel TDX to obtain a quote and request an attestation token.
 
 ### Deploy
 1. Download the [workload.env](./sample-workload/workload.env) file and update the missing configurations.
@@ -94,6 +88,8 @@ This section describes how to build and deploy the demonstration workload. The w
 
    `SKIP_TLS_VERIFICATION` if set to **true** will skip the TLS server certificate verification. For this demo, set it to **true** since we are using self-signed TLS certificates for KBS.
 
+   The `PLATFORM` argument specifies the platform on which the demo app is run, e.g., `azure` for Azure confidential VMs.
+
    `TRUSTAUTHORITY_API_KEY` is the same as used in **kbs.env**.
 
    ```
@@ -101,7 +97,9 @@ This section describes how to build and deploy the demonstration workload. The w
    KBS_PASSWORD=<KBS-admin-password>
    KBS_URL=https://<IP_address>:9443/kbs/v1
    SKIP_TLS_VERIFICATION=<true | false>
+   PLATFORM=azure
    HTTPS_PROXY=
+   TRUSTAUTHORITY_BASE_URL=https://portal.trustauthority.intel.com
    TRUSTAUTHORITY_API_URL=https://api.trustauthority.intel.com
    TRUSTAUTHORITY_API_KEY=<API Key>
    ```
