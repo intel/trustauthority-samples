@@ -10,7 +10,7 @@ on:
       - '**'
 
 jobs:
-  build-test-scan:
+  build:
     runs-on: [ ubuntu-20.04 ]
     env:
       http_proxy: ${{ secrets.HTTP_PROXY }}
@@ -26,7 +26,6 @@ jobs:
         with:
           go-version: '1.21.6'
 
-
       - name: Style Checker
         run: |
           gofmt -l .
@@ -34,3 +33,6 @@ jobs:
              echo "Atleast 1 file need formatting"
              exit 1
           fi
+
+      - name: Build workload
+        run: make -C tdx-ml-workload
