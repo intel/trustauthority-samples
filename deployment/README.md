@@ -6,7 +6,7 @@ There are four components required to build the demo app:
 
 - Dockerfile to build the Intel® Key Broker Service (Intel KBS) relying party container.
 - **kbs.env** environment file to configure Intel KBS. You must modify this file to suit your environment.
-- Dockerfile to build the Intel TDX workload container. The Intel TDX workload build process supports Intel SGX DCAP, Azure confidential VMs with Intel TDX, and Google Cloud Platform (GCP) Confidential VMs.
+- Dockerfile to build the Intel TDX workload container. The Intel TDX workload build process supports Intel TDX VMs, Azure confidential VMs with Intel TDX, and Google Cloud Platform (GCP) Confidential VMs.
 - **workload.env** environment file to supply the workload with Intel KBS and Intel Trust Authority connection info.
 
 ## Prerequisites
@@ -56,7 +56,7 @@ This section describes how to build and deploy the Intel KBS relying party conta
 
 2. Run the following command to start Intel KBS as a Docker container.
    ```bash
-   sudo docker run --name relying-party -d --env-file kbs.env --restart=always -p 9443:9443 relying-party:latest
+   sudo docker run --name relying-party -d --restart=always --env-file kbs.env -p 9443:9443 relying-party:latest
    ```
    9443 is the port Intel KBS will listen on. The port can be changed, if necessary.
 
@@ -103,22 +103,17 @@ This section describes how to build and deploy the demonstration workload. The w
    TRUSTAUTHORITY_API_URL=https://api.trustauthority.intel.com
    TRUSTAUTHORITY_API_KEY=<API Key>
    ```
+
 2. Run the following command to start the demo workload as a Docker container.
    ```bash
-   sudo docker run --name ita-demo -d --env-file workload.env --device=/dev/tdx_guest -v /tmp:/tmp -p 12780:12780 --user 0 trustauthority-demo:latest
+   sudo docker run --name ita-demo -d --privileged --restart=always --env-file workload.env -v /sys/kernel/config:/sys/kernel/config -v /tmp:/tmp -p 12780:12780 --user 0 trustauthority-demo:latest
    ```
    On successful run, the container will generate a `execute_workload_flow.env` file in the `/tmp/` folder. This env file will be used later for executing the workload flow script. Update the env variables in the `execute_workload_flow.env` file if you used custom settings.
 
 > [!NOTE]
-> If running on Azure, replace `--device=/dev/tdx_guest` with `--device=/dev/tpmrm0`  
-> The command above will start the container as root user. This is needed because the Intel TDX demo workload container requires elevated privileges to access `/dev/tdx_guest` or `/dev/tpmrm0` device for quote collection.  
-> If you don't want to run the container as root user, make sure the `/dev/tdx_guest` or `/dev/tpmrm0` device is accessible to the container. One of the ways to do this is to pass `gid` owning the `tdx_guest` or `tpmrm0` device to container.
+> If running on Azure, use following command
 > ```bash
-> sudo docker run --name ita-demo -d --env-file workload.env --device=/dev/tdx_guest -p 12780:12780 --group-add $(getent group <user-group> | cut -d: -f3) trustauthority-demo:latest
-> ```
-> Where `<user-group>` is the group owning the `tdx_guest` or `tpmrm0` device
-> ```bash
-> crw-rw---- 1 root <user-group> 10, 123 /dev/tdx_guest
+> sudo docker run --name ita-demo -d --restart=always --env-file workload.env --device=/dev/tpmrm0 -v /tmp:/tmp -p 12780:12780 --group-add $(getent group tss | cut -d: -f3) trustauthority-demo:latest
 > ```
 
 ### Execute Workflow
@@ -126,6 +121,10 @@ This section describes how to build and deploy the demonstration workload. The w
    ```bash
    wget https://raw.githubusercontent.com/intel/trustauthority-samples/main/deployment/sample-workload/execute_workload_flow.sh
    ```
+
+   > [!NOTE]
+   > The execute_workload_flow.sh script requires `curl` and `jq` commands to run. Please install `curl` and `jq` before proceeding to next step.
+
 2. Run the following command to execute the workflow script.
    ```bash
    bash execute_workload_flow.sh

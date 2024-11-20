@@ -24,7 +24,6 @@ RUN apt update && apt install -y --no-install-recommends openssl jq curl gnupg w
 RUN apt update && apt install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-ARG PLATFORM
 WORKDIR /app
 
 # Create keypair for workload model encryption
@@ -37,9 +36,6 @@ COPY --from=builder /app/trustauthority-samples/encryptor/encrypt /usr/local/bin
 COPY --from=builder /app/trustauthority-samples/deployment/sample-workload/encrypt-model.sh .
 COPY --from=builder /app/trustauthority-samples/deployment/sample-workload/entrypoint.sh .
 COPY --from=builder /app/trustauthority-samples/encryptor/diabetes-linreg.model .
-
-# Install tdx-cli
-RUN apt update && curl -L https://raw.githubusercontent.com/intel/trustauthority-client-for-go/main/release/install-tdx-cli.sh | bash -
 
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID

@@ -7,6 +7,17 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Install tdx-cli
+if [[ -z "$PLATFORM" ]] ; then
+    curl -L https://raw.githubusercontent.com/intel/trustauthority-client-for-go/main/release/install-tdx-cli.sh | CLI_VERSION=v1.6.1 bash -
+else
+    curl -L https://raw.githubusercontent.com/intel/trustauthority-client-for-go/main/release/install-tdx-cli-azure.sh | CLI_VERSION=v1.6.1 bash -
+fi
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to install client"
+    exit 1
+fi
+
 # Generate config.json for tdx cli
 cat <<EOF > /app/config.json
 {
