@@ -37,6 +37,9 @@ COPY --from=builder /app/trustauthority-samples/deployment/sample-workload/encry
 COPY --from=builder /app/trustauthority-samples/deployment/sample-workload/entrypoint.sh .
 COPY --from=builder /app/trustauthority-samples/encryptor/diabetes-linreg.model .
 
+# Install tdx-cli
+RUN apt update && curl -L https://raw.githubusercontent.com/intel/trustauthority-client-for-go/main/release/install-tdx-cli-azure.sh | CLI_VERSION=v1.6.1 bash -
+
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 ARG USERNAME=workload
