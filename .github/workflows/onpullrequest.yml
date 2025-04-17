@@ -13,7 +13,7 @@ jobs:
       - name: Check repository
         id: step1
         run: |
-          if [ ${{ github.repository }} == 'intel/trustauthority-samples' ]; then
+          if [ "${{ github.repository }}" == 'intel/trustauthority-samples' ]; then
             echo "runner=ubuntu-latest" >> $GITHUB_OUTPUT
           else
             echo "runner=self-hosted" >> $GITHUB_OUTPUT
