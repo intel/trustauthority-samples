@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 GITCOMMIT := $(shell git describe --always)
-VERSION := v1.0.0
+VERSION := v1.0.1
 BUILDDATE := $(shell TZ=UTC date +%Y-%m-%dT%H:%M:%S%z)
 
 makefile_path := $(realpath $(lastword $(MAKEFILE_LIST)))
