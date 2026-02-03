@@ -7,7 +7,7 @@ To build the Quickstart App Example, invoke `make` command on terminal.
 > [!Note]
 > Make sure you have `makeself` and `Go` installed before building the application.
 
-Requires **Go 1.21 or newer**. See https://go.dev/doc/install for installation of Go.
+Requires **Go 1.23 or newer**. See https://go.dev/doc/install for installation of Go.
 
 > [!Note]
 > If you are using Dockerfiles deployment, jump to [Usage](#usage) section.
