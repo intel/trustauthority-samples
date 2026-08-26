@@ -7,7 +7,7 @@ This is a utility program to encrypt the data using the wrapped DEK retrieved fr
 go build encrypt.go
 ```
 
-Requires **Go 1.21 or newer**. See https://go.dev/doc/install for installation of Go.
+Requires **Go 1.26 or newer**. See https://go.dev/doc/install for installation of Go.
 
 ## Usage
 

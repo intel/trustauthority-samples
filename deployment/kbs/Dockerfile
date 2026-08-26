@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 
-FROM golang:1.25.5-bookworm AS builder
+FROM golang:1.26.6-trixie AS builder
 
 WORKDIR /app
 
